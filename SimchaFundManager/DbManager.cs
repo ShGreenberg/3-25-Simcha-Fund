@@ -79,14 +79,8 @@ namespace SimchaFundManager
 
             foreach (Transaction t in contributions)
             {
-                // foreach(Contributor c in contr)
-                //{
-                //|| contr.FirstOrDefault(c => c.Id != t.ContributorId) == null
-                //Contributor x = contr.First(c => c.Id == t.ContributorId);
-                //if ( contr.Count == 0 || contr.First(c => c.Id == t.ContributorId) == null)
+
                 if(contr.Count == 0 || !contr.Any(c => c.Id == t.ContributorId))
-                    //if (c.Id != t.ContributorId)
-                    //if(contr.Count == 0 || contr.FirstOrDefault(c => c.Id != t.ContributorId) != null || !contr.FirstOrDefault(c => c.Id == t.ContributorId).AlreadyContributed)
                     {
                         cmd.Parameters.Clear();
                         cmd.Parameters.AddWithValue("@contributorid", t.ContributorId);
@@ -95,23 +89,13 @@ namespace SimchaFundManager
                         cmd.Parameters.AddWithValue("@simchaid", t.SimchaId);
                         cmd.ExecuteNonQuery();
                     }
-                    else
-                    {
-                        int i = 0;
-                    }
-                //}
-                //cmd.Parameters.Clear();
-                //cmd.Parameters.AddWithValue("@contributorid", t.ContributorId);
-                //cmd.Parameters.AddWithValue("@amount", -t.Amount);
-                //cmd.Parameters.AddWithValue("@date", t.Date);
-                //cmd.Parameters.AddWithValue("@simchaid", t.SimchaId);
-                //cmd.ExecuteNonQuery();
+
             }
            
             conn.Close();
             conn.Dispose();
         }
-
+        //doesn't include date
         public void UpdateContributor(Contributor contributor)
         {
             SqlConnection conn = new SqlConnection(_connString);
@@ -139,29 +123,13 @@ namespace SimchaFundManager
             conn.Open();
             foreach (Transaction t in transactions)
             {
-                //List<Contributor> contr = GetContributorsForSimcha((int)t.ContributorId).ToList();
-                //foreach (Contributor c in contr)
-                //{
-                //    if (c.Id == t.ContributorId)
-                //    {
-                //        return;
-                //    }
-                //    else
-                //    {
+                
                         cmd.Parameters.Clear();
                         cmd.Parameters.AddWithValue("@contributorid", t.ContributorId);
                         cmd.Parameters.AddWithValue("@amount", -t.Amount);
                         cmd.Parameters.AddWithValue("@date", t.Date);
                         cmd.Parameters.AddWithValue("@simchaid", t.SimchaId);
                         cmd.ExecuteNonQuery();
-                    //}
-                //}
-                //cmd.Parameters.Clear();
-                //cmd.Parameters.AddWithValue("@contributorid", t.ContributorId);
-                //cmd.Parameters.AddWithValue("@amount", -t.Amount);
-                //cmd.Parameters.AddWithValue("@date", t.Date);
-                //cmd.Parameters.AddWithValue("@simchaid", t.SimchaId);
-                //cmd.ExecuteNonQuery();
             }
 
             conn.Close();
@@ -178,21 +146,6 @@ namespace SimchaFundManager
             conn.Close();
             conn.Dispose();
             return count;
-        }
-
-        public int ContributorCount(int id)
-        {
-            SqlConnection conn = new SqlConnection(_connString);
-            SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = @"SELECT COUNT(c.Id) FROM SimchosContributors sc
-                                    inner join Contributors c on sc.ContributorId = c.Id
-                                        WHERE sc.Id = @id";
-            cmd.Parameters.AddWithValue("@id", id);
-            conn.Open();
-            int amount = (int)cmd.ExecuteScalar();
-            conn.Close();
-            conn.Dispose();
-            return amount;
         }
 
         public Dictionary<int, int> ContributorCountDictionary(IEnumerable<Simcha> simchas)
@@ -266,40 +219,14 @@ namespace SimchaFundManager
 
         }
 
-        public IEnumerable<Contributor> GetContributorsForSimcha(int id)
-        {
-            SqlConnection conn = new SqlConnection(_connString);
-            SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = @"SELECT * FROM Contributors 
-                                WHERE id = @id";
-            cmd.Parameters.AddWithValue("@id", id);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            List<Contributor> contributors = new List<Contributor>();
-            while (reader.Read())
-            {
-                contributors.Add(new Contributor
-                {
-                    Name = (string)reader["name"],
-                    Cell = (string)reader["cell"],
-                    AlwaysInclude = (bool)reader["AlwaysInclude"],
-                    Id = (int)reader["Id"]
-                });
-            }
-            conn.Close();
-            conn.Dispose();
-            return contributors;
-
-        }
-
         public List<Contributor> GetContributorsForSpecificSimcha(int id)
         {
             SqlConnection conn = new SqlConnection(_connString);
             SqlCommand cmd = conn.CreateCommand();
             cmd.CommandText = @"select * from Contributors c
-join SimchosContributors sc
-on sc.ContributorId = c.Id
-where sc.SimchaId = @id";
+                                join SimchosContributors sc
+                                on sc.ContributorId = c.Id
+                                where sc.SimchaId = @id";
             cmd.Parameters.AddWithValue("@id", id);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
@@ -417,6 +344,48 @@ where sc.SimchaId = @id";
             conn.Dispose();
             return simchos;
         }
-  
+
+        #region not use
+        public int ContributorCount(int id)
+        {
+            SqlConnection conn = new SqlConnection(_connString);
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = @"SELECT COUNT(c.Id) FROM SimchosContributors sc
+                                    inner join Contributors c on sc.ContributorId = c.Id
+                                        WHERE sc.Id = @id";
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            int amount = (int)cmd.ExecuteScalar();
+            conn.Close();
+            conn.Dispose();
+            return amount;
+        }
+        public IEnumerable<Contributor> GetContributorsForSimcha(int id)
+        {
+            SqlConnection conn = new SqlConnection(_connString);
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = @"SELECT * FROM Contributors 
+                                WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            List<Contributor> contributors = new List<Contributor>();
+            while (reader.Read())
+            {
+                contributors.Add(new Contributor
+                {
+                    Name = (string)reader["name"],
+                    Cell = (string)reader["cell"],
+                    AlwaysInclude = (bool)reader["AlwaysInclude"],
+                    Id = (int)reader["Id"]
+                });
+            }
+            conn.Close();
+            conn.Dispose();
+            return contributors;
+
+        }
+        #endregion
+
     }
 }
