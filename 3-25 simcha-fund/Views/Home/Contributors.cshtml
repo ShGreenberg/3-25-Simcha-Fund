@@ -1,0 +1,160 @@
+﻿@using SimchaFundManager
+@using _3_25_simcha_fund.Models
+@model ContributorsViewModel
+
+<div class="container">
+    <h2 class="col-lg-offset-5">Contributors</h2>
+    <button class="btn btn-warning" id="new-contributor" data-toggle="modal" data-target="#new-contributor-modal">New Contributor</button>
+    <br />
+    <br />
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>Deposit</th>
+            <th>Name</th>
+            <th>Cell</th>
+            <th>Balance</th>
+            <th>Always Include</th>
+            <th>Actions</th>
+        </tr>
+        @foreach (Contributor c in Model.Contributors)
+        {
+            <tr>
+                <td><button class="btn btn-success deposit" data-toggle="modal" data-target="#deposit-modal" data-id="@c.Id">Deposit</button> </td>
+                <td>@c.Name</td>
+                <td>@c.Cell</td>
+                <td>@c.Balance.ToString("C")</td>
+                <td class="@(c.AlwaysInclude ? "glyphicon glyphicon-ok" :"" )"></td>
+                <td>
+                    <a href="/home/showhistory?id=@c.Id" class="btn btn-primary">Show History</a>
+                    <button class="btn btn-danger edit" data-toggle="modal" data-target="#edit-modal" data-name="@c.Name" 
+                            data-cell="@c.Cell" data-alwaysinclude="@c.AlwaysInclude" data-date="" data-id="@c.Id">Edit</button>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+<div id="edit-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <form method="post" action="/home/editcontributor">
+                <div class="modal-body">
+                    <p>
+                        <input type="text" name="name" placeholder="Name" id="edit-name"/>
+                        <input type="text" name="cell" placeholder="Cell" id="edit-cell" />
+                        <input type="date" name="date" id="edit-date"/>
+                        <input type="checkbox" value="true" name="alwaysinclude" id="edit-alwaysinclude"/>
+                        @* not great - just for testing....  also issue with balance*@
+                        <input type="hidden" name="Id"  id="contributorid" />
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div id="new-contributor-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <form method="post" action="/home/addcontributor">
+                <div class="modal-body">
+                    <p>
+                        <input type="text" name="name" placeholder="Name" />
+                        <input type="text" name="cell" placeholder="Cell" />
+                        <input type="date" name="date" />
+                        <input type="text" name="amount" placeholder="Initial Deposit" />
+                        <input type="checkbox" value="true" name="alwaysinclude" />
+                        @* not great - just for testing....  also issue with balance*@
+                        <input type="hidden" name="ContributorId" value="0" />
+                        <input type="hidden" name="balance" value="0" />
+                        <label>Always Include</label>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="save-modal">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div id="deposit-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <form method="post" action="/home/deposit">
+                <div class="modal-body">
+                    <p>
+                        <input type="text" name="amount" placeholder="amount" />
+                        <input type="date" name="date" />
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="contributor-id" name="contributorid" />
+
+                    <button class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" formaction="/home/contributors">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+@*@foreach (Contributor c in Model.Contributors)
+    {
+        @c.id*@
+@*<div id=$"myModal" class="modal fade" role="dialog">*@
+@*<div class="modal-dialog">*@
+
+<!-- Modal content-->
+@*<@*div class="modal-content">
+    <div class="modal-header">*@*
+@*<button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Modal Header</h4>
+    </div>
+    <div class="modal-body">*@
+@*<p>Some text in the modal.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>*@
+
+@*</div>
+    </div>*@
+
+@*}*@
+
+@section scripts{
+    <script src="~/Scripts/Contributor.js"></script>
+}

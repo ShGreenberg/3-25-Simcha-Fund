@@ -1,0 +1,58 @@
+﻿@using SimchaFundManager
+@using _3_25_simcha_fund.Models
+@model ContributionsViewModel
+<div class="container">
+    <h1>Contributors for simcha - @Model.SimchaId</h1>
+    <form method="post" action="/home/updatecontributions">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>Contribute</th>
+                <th>Name</th>
+                <th>Balance</th>
+                <th>Always Include</th>
+                <th>Amount</th>
+            </tr>
+            @* need to make it that when go on the page - ones that already contributed are checked and that they don't
+                contribute again - can't have more than the maxcontriturors....*@
+            @foreach (Contributor c in Model.Contributors)
+            {
+                <tr>
+                    @*<td><input type="checkbox" value="true" name="contribute" /></td>*@
+                    @* only get it if they want to contribute *@
+                    @if (c.AlreadyContributed)
+                    {
+                        <td>
+                            <input type="checkbox" id="@Model.counter" class="already-contributed" name="contributions[@Model.counter].Contribute" value="true" checked />
+                            <input type="hidden" id="A{@Model.counter}"  name="contributors[@Model.counter].AlreadyContributed" />
+                        </td>
+                       
+                    }
+                    else
+                    {
+                        <td><input type="checkbox" name="contributions[@Model.counter].Contribute" value="true" /></td>
+
+                    }
+                    <td>@c.Name</td>
+                    <td>@c.Balance</td>
+                    <td style="text-align:center;vertical-align:middle">
+                        <span style="font-size:20px" class="@(c.AlwaysInclude ? "glyphicon glyphicon-ok-sign" :"" )"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="contributions[@Model.counter].Amount" value="5" />
+                        <input type="hidden" name="contributions[@Model.counter].ContributorId" value="@c.Id" />
+                        <input type="hidden" name="contributions[@Model.counter].Date" value="@DateTime.Now" />
+                        <input type="hidden" name="contributions[@Model.counter].SimchaId" value="@Model.SimchaId" />
+                    </td>
+                    @(Model.counter++);
+                </tr>
+
+            }
+        </table>
+
+        <br />
+        <input type="hidden" value="@Model.SimchaId" name="id" />
+        <button id="submit-form" class="btn-lg btn-info col-lg-offset-5">Update</button>
+    </form>
+</div>
+
+

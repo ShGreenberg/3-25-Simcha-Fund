@@ -1,31 +1,61 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
+﻿@using SimchaFundManager
+@using _3_25_simcha_fund.Models
+@model IndexViewModel
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+<div class="container">
+    <h1 class="col-lg-offset-5">Simchos</h1>
+    <div class="row col-lg-offset-1">
+        <button class="btn btn-warning" id="add-simcha" data-toggle="modal" data-target="#add-simcha-modal">Add Simcha</button>
+        <br />
+        <br />
+    </div>
+    <div class="container">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Contributions</th>
+                <th>Simcha Name</th>
+                <th>Contributor Count</th>
+                <th>Total</th>
+                <th>Date</th>
+            </tr>
+            @foreach (Simcha s in Model.Simchos)
+            {
+                <tr>
+                    <td>
+                        <a href="/home/contributions?id=@s.Id" class="btn btn-primary">Contributions</a>
+                    </td>
+                    <td>@s.SimchaName</td>
+                    <td>@Model.NumContributors[s.Id] / @Model.MaxContributors</td>
+                    <td>@Model.Totals[s.Id].ToString("C")</td>
+                    <td>@s.Date</td>
+                </tr>
+            }
+        </table>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+<div class="modal" tabindex="-1" role="dialog" id="add-simcha-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add a Simcha</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/home/AddSimcha">
+                <div class="modal-body">
+                    <p>
+                        <input type="text" name="SimchaName" placeholder="Simcha Name" />
+                        <input type="date" name="Date" placeholder="Date" />
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button  class="btn btn-primary">Save</button>
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" formaction="/home/index">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
