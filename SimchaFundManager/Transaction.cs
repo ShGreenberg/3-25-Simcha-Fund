@@ -14,6 +14,5 @@ namespace SimchaFundManager
         public DateTime Date { get; set; }
         public int? SimchaId { get; set; }
         public bool Contribute { get; set; }
-        //in database need to figure out transactions - relationships.....
     }
 }

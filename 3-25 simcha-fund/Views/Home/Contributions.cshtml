@@ -12,13 +12,10 @@
                 <th>Always Include</th>
                 <th>Amount</th>
             </tr>
-            @* need to make it that when go on the page - ones that already contributed are checked and that they don't
-                contribute again - can't have more than the maxcontriturors....*@
+
             @foreach (Contributor c in Model.Contributors)
             {
                 <tr>
-                    @*<td><input type="checkbox" value="true" name="contribute" /></td>*@
-                    @* only get it if they want to contribute *@
                     @if (c.AlreadyContributed)
                     {
                         <td>

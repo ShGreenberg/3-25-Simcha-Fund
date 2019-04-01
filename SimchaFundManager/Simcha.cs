@@ -11,6 +11,5 @@ namespace SimchaFundManager
         public int Id { get; set; }
         public string SimchaName { get; set; }
         public DateTime Date { get; set; }
-        //public int PeopleContributing { get; set; }
     }
 }
