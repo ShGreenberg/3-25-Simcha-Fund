@@ -32,12 +32,9 @@ namespace _3_25_simcha_fund.Controllers
         {
             DbManager mgr = new DbManager(Properties.Settings.Default.ConStr);
             ContributionsViewModel vm = new ContributionsViewModel();
-            //vm.Contributors = mgr.GetContributors();
             vm.SimchaId = id;
             Dictionary<int, List<Contributor>> test = new Dictionary<int, List<Contributor>>();
             List<Simcha> simchas = mgr.GetSimchos().ToList();
-           
-            //Session[$"contributorsfor{id}"] = vm.Contributors.ToList();
             if (Session["contributorsForSimcha"] == null)
             {
                 foreach (Simcha s in simchas)
@@ -46,18 +43,15 @@ namespace _3_25_simcha_fund.Controllers
                 }
                 Session["contributorsForSimcha"] = test;
             }
-            var x = (Dictionary<int,List<Contributor>>)Session["contributorsForSimcha"];
+            var fromSession = (Dictionary<int,List<Contributor>>)Session["contributorsForSimcha"];
             var trial = mgr.GetContributors();
             foreach(Contributor c in trial)
             {
-                var hope = x[id].FirstOrDefault(t => t.Id == c.Id);
-                if (hope != null)
+                if (fromSession[id].FirstOrDefault(t => t.Id == c.Id) != null)
                 {
-                    //hope.AlreadyContributed = true; 
                     c.AlreadyContributed = true;
                 }
             }
-            //vm.Contributors = x[id];
             vm.Contributors = trial;
             return View(vm);
         }
@@ -99,45 +93,23 @@ namespace _3_25_simcha_fund.Controllers
         public ActionResult UpdateContributions(List<Transaction> contributions, int id)
         {
             DbManager mgr = new DbManager(Properties.Settings.Default.ConStr);
-            //foreach(Transaction ca in contributions)
-            //{
-            //    Transaction t = new Transaction
-            //    {
-            //        Amount = -ca.Amount,
-            //        Date = ca.Date,
-            //        ContributorId = ca.ContributorId,
-            //        SimchaId = ca.SimchaId
-            //    };
-            //}
-
-            //List<Contributor> contributors = (List<Contributor>)Session[$"contributorsfor{id}"];
-            var test = (Dictionary<int, List<Contributor>>)Session["contributorsForSimcha"];
+            var fromSession = (Dictionary<int, List<Contributor>>)Session["contributorsForSimcha"];
             List<Transaction> transactions = new List<Transaction>();
             List<Transaction> delete = new List<Transaction>();
             int x = 0;
             foreach(Transaction t in contributions)
             {
-                //Contributor contr = contributors.FirstOrDefault(c => c.Id == t.ContributorId);
 
                 if (t.Contribute)
                 {
-                    //contr.AlreadyContributed = true;
-                  
                     transactions.Add(t);
                     x++;
-                    //var x = mgr.GetContributorsForSpecificSimcha((int)t.SimchaId);
-                    //test[id].AddRange(mgr.GetContributorsForSpecificSimcha((int)t.SimchaId));
-                    //test[id][(int)t.ContributorId].AlreadyContributed = true;
                 }
                 else
                 {
-                    //if (contr.AlreadyContributed)
-                    //if(test[id][(int)t.ContributorId].AlreadyContributed)
                     var con = mgr.GetContributorsForSpecificSimcha((int)t.SimchaId);
                     if(con.FirstOrDefault(c => c.Id == t.ContributorId) != null)
-                    //if (test[id].Count >= t.ContributorId && test[id][(int)t.ContributorId].AlreadyContributed)
                     {
-                        //remove transaction
                         delete.Add(t);
                     }
                 }
@@ -145,20 +117,12 @@ namespace _3_25_simcha_fund.Controllers
             mgr.AddContribution(transactions);
             mgr.DeleteTrans(delete);
             
-            test[id].AddRange(mgr.GetContributorsForSpecificSimcha((int)id));
+            fromSession[id].AddRange(mgr.GetContributorsForSpecificSimcha((int)id));
            for (int i = 0; i < x; i++)
             {
-                //test[id].AddRange(mgr.GetContributorsForSpecificSimcha((int)id));
-                
-                test[id][i].AlreadyContributed = true;
-                //var z = (List<Contributor>)Session["contributorsForSimcha"];
-                //z[id].AlreadyContributed = true;
-
+                fromSession[id][i].AlreadyContributed = true;
             }
-            Session["contributorsForSimcha"] = test;
-
-
-
+            Session["contributorsForSimcha"] = fromSession;
             return Redirect("/");
         }
 
@@ -169,8 +133,6 @@ namespace _3_25_simcha_fund.Controllers
             vm.Transactions = mgr.GetHistory(id);
             vm.Simchos = mgr.GetSimchosForContributor(id);
             vm.ContributorName = mgr.GetContributorName(id);
-           
-            //vm.SimchaName = mgr.GetSimchaName((int)(vm.Transactions.ToList()[0].SimchaId));
             return View(vm);
         }
     }
